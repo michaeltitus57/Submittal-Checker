@@ -2,13 +2,6 @@ fastapi
 uvicorn
 python-multipart
 pydantic
-sqlalchemy
-psycopg[binary]
-celery
-redis
-boto3
-stripe
-PyJWT
-passlib[bcrypt]
+email-validator
 PyJWT
 passlib[bcrypt]

@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: submittal-api
+    env: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port 10000
+    healthCheckPath: /health
+
+  - type: worker
+    name: submittal-worker
+    env: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: celery -A app.tasks.celery_app worker --loglevel=INFO --concurrency=2
+
+databases:
+  - name: submittal-db
+    plan: starter
+
+  - name: submittal-redis
+    type: redis
+    plan: starter

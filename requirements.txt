@@ -3,5 +3,3 @@ uvicorn
 python-multipart
 pydantic
 email-validator
-PyJWT
-passlib[bcrypt]

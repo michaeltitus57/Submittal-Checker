@@ -41,5 +41,4 @@ def login(body: LoginRequest):
 def me(user_id: str = Depends(get_current_user_id)):
     user = users.get_user_by_id(user_id)
     if not user:
-        raise HTTPException(status_code=401, detail="User not found")
-    return {"id": user.id, "email": user.email}
+        raise HTTPException(status_code=401, detail="User not fou

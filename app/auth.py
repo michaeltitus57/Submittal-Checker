@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 import jwt
-from passlib.hash import bcrypt
+from passlib.hash import bcrypt_sha256
 from fastapi import HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
@@ -14,10 +14,10 @@ TOKEN_DAYS = 7
 bearer = HTTPBearer(auto_error=False)
 
 def hash_password(password: str) -> str:
-    return bcrypt.hash(password)
+    return bcrypt_sha256.hash(password)
 
 def verify_password(password: str, password_hash: str) -> bool:
-    return bcrypt.verify(password, password_hash)
+    return bcrypt_sha256.verify(password, password_hash)
 
 def create_token(user_id: str) -> str:
     now = datetime.now(timezone.utc)

@@ -1,18 +1,34 @@
 import os
 import uuid
+import json
 from datetime import datetime
 from typing import Dict, Optional
 
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from pydantic import BaseModel
 
-app = FastAPI(title="Submittal Checker", version="0.2.0")
+app = FastAPI(title="Submittal Checker", version="0.2.1")
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-# In-memory "database" for MVP
-PROJECTS: Dict[str, dict] = {}
+DATA_FILE = "projects.json"
+
+def load_projects() -> Dict[str, dict]:
+    if not os.path.exists(DATA_FILE):
+        return {}
+    try:
+        with open(DATA_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+def save_projects(projects: Dict[str, dict]) -> None:
+    with open(DATA_FILE, "w", encoding="utf-8") as f:
+        json.dump(projects, f, indent=2)
+
+# Load existing projects on startup
+PROJECTS: Dict[str, dict] = load_projects()
 
 @app.get("/health")
 def health():
@@ -38,6 +54,7 @@ def create_project(name: Optional[str] = None):
         "plan_pdf": None,
         "submittal_pdf": None,
     }
+    save_projects(PROJECTS)
     return {"project_id": project_id}
 
 @app.get("/projects/{project_id}", response_model=ProjectResponse)
@@ -82,5 +99,8 @@ async def upload_pdf(
         proj["plan_pdf"] = save_path
     else:
         proj["submittal_pdf"] = save_path
+
+    PROJECTS[project_id] = proj
+    save_projects(PROJECTS)
 
     return {"ok": True, "project_id": project_id, "doc_type": doc_type, "path": save_path}
